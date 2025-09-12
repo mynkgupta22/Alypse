@@ -33,3 +33,5 @@ async def get_db():
     """Dependency to get async database session"""
     async with AsyncSessionLocal() as session:
         yield session
+
+        

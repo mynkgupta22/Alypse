@@ -6,7 +6,7 @@ from pydantic import field_validator
 import os
 
 class Settings(BaseSettings):
-    env_name = os.getenv("ENV", "development")  # default: development
+    env_name: str = os.getenv("ENV", "development")
     model_config = SettingsConfigDict(
         env_file=str(Path(__file__).parent.parent.parent / "config" / f".env.{env_name}"),
         case_sensitive=False,
@@ -15,6 +15,7 @@ class Settings(BaseSettings):
 
     app_name: str = "ALYPSE APP"
     app_version: str = "1.0.0"
+    debug: bool = False
 
     # Database
     database_url: str = "postgresql://postgres:root@localhost:5432/orris1,https://orris-4vg9-mynkgupta22s-projects.vercel.app"    
