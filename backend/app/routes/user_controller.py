@@ -6,6 +6,7 @@ from google.auth.transport import requests as grequests
 
 from app.core.database import get_db
 from app.services.user_service import UserService
+from app.auth.auth_utils import create_access_token
 from app.schemas.user_schemas import (
     UserCreate, UserResponse,UserUpdate,
     UserLogin, TokenResponse,
@@ -59,19 +60,34 @@ async def delete_user(user_id: int, db: AsyncSession = Depends(get_db)):
 @router.post("/login", response_model=TokenResponse)
 async def login(user_in: UserLogin, response: Response, db: AsyncSession = Depends(get_db)):
     service = UserService(db)
-    session_token = await service.login(user_in.email, user_in.password)
-    if not session_token:
+    user = await service.authenticate_user(user_in.username, user_in.password)
+    if not user:
         raise HTTPException(status_code=401, detail="Invalid email or password")
 
+    # Build claims
+    token_data = {
+        "sub": str(user.id),
+        "role": user.role.value,
+        "email": user.primary_email,
+    }
+
+    # Generate token
+    access_token, expire = create_access_token(data=token_data)
+
+    # Set cookie
     response.set_cookie(
-        key="session_token",
-        value=session_token,
+        key="access_token",
+        value=access_token,
         httponly=True,
         samesite="lax",
-        secure=False  # change to True in production with HTTPS
+        secure=False,  # True in production
     )
-    return {"session_token": session_token}
 
+    return TokenResponse(
+        access_token=access_token,
+        token_type="bearer",
+        user=UserResponse.from_orm(user)
+    )
 
 @router.post("/logout")
 async def logout(request: Request, db: AsyncSession = Depends(get_db)):

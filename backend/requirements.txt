@@ -10,3 +10,8 @@ python-decouple
 httpx
 pydantic-settings
 pydantic[email]
+google-auth 
+google-auth-oauthlib
+google-auth-httplib2
+asyncpg
+greenlet 

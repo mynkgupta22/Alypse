@@ -29,11 +29,18 @@ class User(Base):
     emails = relationship("UserEmail", back_populates="user", cascade="all, delete-orphan")
     sessions = relationship("UserSession", back_populates="user", cascade="all, delete-orphan")
 
+    @property
+    def primary_email(self) -> str | None:
+        """Return the primary email if available, else None"""
+        primary = next((e for e in self.emails if e.is_primary), None)
+        return primary.email if primary else None
+    
     # Indexes
     __table_args__ = (
         Index('idx_user_role_active', 'role', 'is_active'),
         Index('idx_user_created_at', 'created_at'),
     )
+
 
 
 class UserEmail(Base):

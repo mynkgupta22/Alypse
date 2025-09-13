@@ -18,7 +18,7 @@ class Settings(BaseSettings):
     debug: bool = False
 
     # Database
-    database_url: str = "postgresql://postgres:root@localhost:5432/orris1,https://orris-4vg9-mynkgupta22s-projects.vercel.app"    
+    database_url: str = "postgresql://postgres:root@localhost:5432/alypse_db" 
     # JWT
     jwt_secret_key: str = "default-secret-key"
     jwt_refresh_secret_key: str = "default-refresh-secret-key"
